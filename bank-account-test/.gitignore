@@ -1,0 +1,5 @@
+/.idea/
+*.iml
+.environments
+/.vscode/
+node_modules/
