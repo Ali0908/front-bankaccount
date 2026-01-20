@@ -1,0 +1,82 @@
+<div class="account-statement-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <button mat-icon-button (click)="goBack()">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        Relevé de Compte
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (loading()) {
+        <div class="loading">Chargement...</div>
+      }
+
+      @if (error()) {
+        <div class="error">{{ error() }}</div>
+      }
+
+      @if (statement() && !loading()) {
+        <div class="account-info">
+          <h3>Compte: {{ statement()!.accountNumber }}</h3>
+          <p>Type: {{ statement()!.accountType }}</p>
+          <p>Solde Compte Courant: {{ formatAmount(statement()!.currentBalance) }}</p>
+          @if (statement()!.savingsBalance > 0) {
+            <p>Solde Livret d'Épargne: {{ formatAmount(statement()!.savingsBalance) }}</p>
+          }
+          <p class="statement-date">Relevé du {{ formatDate(statement()!.statementDate) }}</p>
+        </div>
+
+        <div class="transactions-title">
+          <h4>Opérations des 30 derniers jours</h4>
+        </div>
+
+        @if (statement()!.transactions.length === 0) {
+          <p class="no-transactions">Aucune opération sur cette période</p>
+        } @else {
+          <table mat-table [dataSource]="dataSource()" class="transactions-table">
+            <!-- Date Column -->
+            <ng-container matColumnDef="date">
+              <th mat-header-cell *matHeaderCellDef>Date</th>
+              <td mat-cell *matCellDef="let tx">{{ formatDate(tx.date) }}</td>
+            </ng-container>
+
+            <!-- Type Column -->
+            <ng-container matColumnDef="type">
+              <th mat-header-cell *matHeaderCellDef>Type</th>
+              <td mat-cell *matCellDef="let tx">{{ tx.type }}</td>
+            </ng-container>
+
+            <!-- Amount Column -->
+            <ng-container matColumnDef="amount">
+              <th mat-header-cell *matHeaderCellDef>Montant</th>
+              <td
+                mat-cell
+                *matCellDef="let tx"
+                [class.positive]="tx.amount > 0"
+                [class.negative]="tx.amount < 0"
+              >
+                {{ formatAmount(tx.amount) }}
+              </td>
+            </ng-container>
+
+            <!-- Balance After Column -->
+            <ng-container matColumnDef="balanceAfter">
+              <th mat-header-cell *matHeaderCellDef>Solde après opération</th>
+              <td mat-cell *matCellDef="let tx">{{ formatAmount(tx.balanceAfter) }}</td>
+            </ng-container>
+
+            <thead>
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            </thead>
+            <tbody>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+            </tbody>
+          </table>
+        }
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

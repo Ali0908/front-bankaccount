@@ -1,0 +1,33 @@
+version: "3.9"
+services:
+  back:
+    build: ./back-bankaccount
+    container_name: bank-back
+    ports:
+      - "${BACK_PORT_MAPPING:-8080:8080}"
+
+  front:
+    build:
+      context: ./front-bankaccount
+      args:
+        API_URL: ${API_URL_INTERNAL}
+    container_name: bank-front
+    depends_on:
+      - back
+    ports:
+      - "${FRONT_PORT_MAPPING:-80:80}"
+
+  front-dev:
+    image: node:20
+    container_name: bank-front-dev
+    working_dir: /app
+    volumes:
+      - ./front-bankaccount:/app
+    command: sh -c "npm install && sed -i 's#${FRONT_DEV_PLACEHOLDER_URL}#${API_URL_DEV}#g' src/environments/environment.development.ts && npm start -- --host 0.0.0.0 --port ${FRONT_DEV_PORT:-4200}"
+    environment:
+      - API_URL_DEV=${API_URL_DEV}
+      - FRONT_DEV_PLACEHOLDER_URL=${FRONT_DEV_PLACEHOLDER_URL}
+    ports:
+      - "${FRONT_DEV_PORT_MAPPING:-4200:4200}"
+    depends_on:
+      - back

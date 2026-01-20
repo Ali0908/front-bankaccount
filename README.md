@@ -1,59 +1,109 @@
-# FrontBankaccount
+# 💰 **Bank Account** 💰
+🌐 Disponible en :  
+[🇫🇷 Français](README.md) | [🇬🇧 English](README.en.md)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.14.
+# Sujet
 
-## Development server
+Ce kata est un challenge d'[architecture hexagonale](https://fr.wikipedia.org/wiki/Architecture_hexagonale) autour du domaine de la banque.
 
-To start a local development server, run:
+## ⚠️ Modalités de candidatures ⚠️
 
-```bash
-ng serve
-```
+> Ce kata a deux objectifs : 
+> - d'une part, permettre votre évaluation technique en tant que candidat ; 
+> - d'autre part servir de base à votre montée en compétences si vous nous rejoignez :smile:.
+> 
+> Il a donc volontairement un scope très large.
+> 
+> **Dans le premier cas (processus de recrutement), nous comprenons que le temps est une ressource précieuse et limitée. 
+> C'est pourquoi nous vous proposons trois niveaux d'engagement, selon le temps que vous pouvez y consacrer :**
+>
+> 1. vous avez peu de temps (une soirée) : Concentrez-vous uniquement sur le code métier. 
+>   - Assurez-vous qu'il est testé et fonctionnel, avec des adapteurs de tests. 
+>   - **Nous ne vous tiendrons pas rigueur de ne pas avoir réalisé les autres parties.** 
+>   - **Nous aborderons ensemble les éléments non couverts lors de l'entretien technique**
+> 2. vous avez plus de temps (plusieurs soirées) : le code métier, exposé derrière une api REST, et une persistance fonctionnelle ; le tout testé de bout en bout.
+> 3. vous avez beaucoup de temps, et envie d'aller plus loin : la même chose, avec la containerisation de l'application, et une pipeline de CI/CD (vous ne pourrez pas l'exécuter mais montrez-nous quand même ce dont vous êtes capable) ;p
+> 
+> Vous serez évalués notamment sur les points suivants :
+> 
+> - Tout code livré doit être testé de manière adéquate (cas passants et non passants)
+> - Nous serons très vigilants sur le design, la qualité, et la lisibilité du code (et des commits)
+> 
+> Nous comprenons que chaque candidat a des contraintes de temps différentes, et nous valoriserons votre capacité à prioriser et à livrer un travail de qualité dans le temps imparti.
+>
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Modalités de réalisation
 
-## Code scaffolding
+> Pour réaliser ce kata : 
+> - Tirez une branche depuis main
+> - Réalisez vos développements sur cette branche
+> - Quand vous êtes prêts à effectuer votre rendu, ouvrez une merge request vers main 
+>
+> ⚠️ L'ouverture de votre merge request déclenchera la revue de votre code !
+> 
+>⚠️ Cette merge request sert de support à la revue de code, **NE LA MERGEZ PAS !**
+>
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
 
-```bash
-ng generate component component-name
-```
+### Feature 1 : le compte bancaire
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+On souhaite proposer une fonctionnalité de compte bancaire. 
 
-```bash
-ng generate --help
-```
+Ce dernier devra disposer : 
 
-## Building
+- D'un numéro de compte unique (format libre)
+- D'un solde
+- D'une fonctionnalité de dépôt d'argent
+- D'une fonctionnalité de retrait d'argent
 
-To build the project run:
+La règle métier suivante doit être implémentée : 
 
-```bash
-ng build
-```
+- Un retrait ne peut pas être effectué s'il représente plus d'argent qu'il n'y en a sur le compte
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+__          
 
-## Running unit tests
+### Feature 2 : le découvert
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+On souhaite proposer un système de découvert autorisé sur les comptes bancaires.
 
-```bash
-ng test
-```
+La règle métier suivante doit être implémentée : 
 
-## Running end-to-end tests
+- Si un compte dispose d'une autorisation de découvert, alors un retrait qui serait supérieur au solde du compte est autorisé
+si le solde final ne dépasse pas le montant de l'autorisation de découvert
 
-For end-to-end (e2e) testing, run:
+__
 
-```bash
-ng e2e
-```
+### Feature 3 : le livret
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+On souhaite proposer un livret d'épargne.
 
-## Additional Resources
+Un livret d'épargne est un compte bancaire qui : 
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- Dispose d'un plafond de dépôt : on ne peut déposer d'argent sur ce compte que dans la limite du plafond du compte (exemple : 22950€ sur un livret A)
+- Ne peut pas avoir d'autorisation de découvert
+
+__
+
+### Feature 4 : le relevé de compte
+
+On souhaite proposer une fonctionnalité de relevé mensuel (sur un mois glissant) des opérations sur le compte
+
+Ce relevé devra faire apparaître : 
+
+- Le type de compte (Livret ou Compte Courant)
+- Le solde du compte à la date d'émission du relevé
+- La liste des opérations ayant eu lieu sur le compte, triées par date, dans l'ordre antéchronologique
+
+## Bonne chance !
+
+
+![archi-hexa](./assets/hexa-schema.png)
+
+
+ 
+
+
+
+
+
+

@@ -1,0 +1,224 @@
+stages:
+  - test
+  - build
+  - push
+  - deploy
+
+variables:
+  DOCKER_REGISTRY: docker.io
+  DOCKER_IMAGE_BACK: $DOCKER_REGISTRY/$DOCKER_USERNAME/bank-account-back
+  DOCKER_IMAGE_FRONT: $DOCKER_REGISTRY/$DOCKER_USERNAME/bank-account-front
+  SONAR_HOST_URL: "https://sonarcloud.io"
+  KUBERNETES_NAMESPACE_DEV: "bank-account-dev"
+  KUBERNETES_NAMESPACE_PROD: "bank-account-prod"
+
+# ==================== TEST STAGE ====================
+test:back:
+  stage: test
+  image: maven:3.9.9-eclipse-temurin-21
+  script:
+    - cd back-bankaccount
+    - mvn clean test
+    - mvn sonar:sonar -Dsonar.projectKey=$SONAR_PROJECT_KEY_BACK -Dsonar.organization=$SONAR_ORGANIZATION -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_TOKEN
+  coverage: '/Coverage: \d+\.\d+%/'
+  artifacts:
+    reports:
+      junit: back-bankaccount/target/surefire-reports/TEST-*.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: back-bankaccount/target/site/jacoco/index.html
+    paths:
+      - back-bankaccount/target/surefire-reports/
+    expire_in: 30 days
+  only:
+    - develop
+    - main
+    - merge_requests
+  allow_failure: false
+
+test:front:
+  stage: test
+  image: node:20-alpine
+  script:
+    - cd front-bankaccount
+    - npm ci
+    - npm run test -- --watch=false --code-coverage
+    - npm install -g sonar-scanner
+    - sonar-scanner
+      -Dsonar.projectKey=$SONAR_PROJECT_KEY_FRONT
+      -Dsonar.organization=$SONAR_ORGANIZATION
+      -Dsonar.sources=src
+      -Dsonar.exclusions=**/*.spec.ts,node_modules/**
+      -Dsonar.host.url=$SONAR_HOST_URL
+      -Dsonar.login=$SONAR_TOKEN
+  coverage: '/Statements\s*:\s*(\d+\.?\d*)%/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: front-bankaccount/coverage/cobertura-coverage.xml
+    paths:
+      - front-bankaccount/coverage/
+    expire_in: 30 days
+  only:
+    - develop
+    - main
+    - merge_requests
+  allow_failure: false
+
+# ==================== BUILD STAGE ====================
+build:back:
+  stage: build
+  image: maven:3.9.9-eclipse-temurin-21
+  script:
+    - cd back-bankaccount
+    - mvn clean package -DskipTests
+  artifacts:
+    paths:
+      - back-bankaccount/target/back-bankaccount-*.jar
+    expire_in: 1 hour
+  only:
+    - develop
+    - main
+  dependencies:
+    - test:back
+
+build:front:
+  stage: build
+  image: node:20-alpine
+  script:
+    - cd front-bankaccount
+    - npm ci
+    - npm run build
+  artifacts:
+    paths:
+      - front-bankaccount/dist/
+    expire_in: 1 hour
+  only:
+    - develop
+    - main
+  dependencies:
+    - test:front
+
+# ==================== PUSH TO REGISTRY ====================
+push:back:dev:
+  stage: push
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  script:
+    - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+    - export TAG="${CI_COMMIT_SHA:0:8}-dev.$(date +%Y%m%d)"
+    - docker build -t $DOCKER_IMAGE_BACK:$TAG -t $DOCKER_IMAGE_BACK:dev back-bankaccount/
+    - docker push $DOCKER_IMAGE_BACK:$TAG
+    - docker push $DOCKER_IMAGE_BACK:dev
+  only:
+    - develop
+  dependencies:
+    - build:back
+  allow_failure: false
+
+push:back:prod:
+  stage: push
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  script:
+    - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+    - export TAG=$(git describe --tags --always | sed 's/^v//')
+    - docker build -t $DOCKER_IMAGE_BACK:$TAG -t $DOCKER_IMAGE_BACK:latest back-bankaccount/
+    - docker push $DOCKER_IMAGE_BACK:$TAG
+    - docker push $DOCKER_IMAGE_BACK:latest
+  only:
+    - main
+  when: manual
+  dependencies:
+    - build:back
+  allow_failure: false
+
+push:front:dev:
+  stage: push
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  script:
+    - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+    - export TAG="${CI_COMMIT_SHA:0:8}-dev.$(date +%Y%m%d)"
+    - docker build -t $DOCKER_IMAGE_FRONT:$TAG -t $DOCKER_IMAGE_FRONT:dev --build-arg API_URL=http://bank-back:8080 front-bankaccount/
+    - docker push $DOCKER_IMAGE_FRONT:$TAG
+    - docker push $DOCKER_IMAGE_FRONT:dev
+  only:
+    - develop
+  dependencies:
+    - build:front
+  allow_failure: false
+
+push:front:prod:
+  stage: push
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  script:
+    - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+    - export TAG=$(git describe --tags --always | sed 's/^v//')
+    - docker build -t $DOCKER_IMAGE_FRONT:$TAG -t $DOCKER_IMAGE_FRONT:latest --build-arg API_URL=https://api.bankaccount.prod front-bankaccount/
+    - docker push $DOCKER_IMAGE_FRONT:$TAG
+    - docker push $DOCKER_IMAGE_FRONT:latest
+  only:
+    - main
+  when: manual
+  dependencies:
+    - build:front
+  allow_failure: false
+
+# ==================== DEPLOY STAGE ====================
+deploy:dev:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    - export TAG="${CI_COMMIT_SHA:0:8}-dev.$(date +%Y%m%d)"
+    - mkdir -p $HOME/.kube
+    - echo $KUBECONFIG_DEV | base64 -d > $HOME/.kube/config
+    - kubectl config use-context $KUBERNETES_CONTEXT_DEV
+    - kubectl set image deployment/bank-back -n $KUBERNETES_NAMESPACE_DEV bank-back=$DOCKER_IMAGE_BACK:$TAG --record
+    - kubectl set image deployment/bank-front -n $KUBERNETES_NAMESPACE_DEV bank-front=$DOCKER_IMAGE_FRONT:$TAG --record
+    - kubectl rollout status deployment/bank-back -n $KUBERNETES_NAMESPACE_DEV
+    - kubectl rollout status deployment/bank-front -n $KUBERNETES_NAMESPACE_DEV
+  only:
+    - develop
+  dependencies:
+    - push:back:dev
+    - push:front:dev
+  allow_failure: false
+  on_failure:
+    script:
+      - echo "Deployment failed, sending notification..."
+      # Email notification via curl ou script
+
+deploy:prod:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    - export TAG=$(git describe --tags --always | sed 's/^v//')
+    - mkdir -p $HOME/.kube
+    - echo $KUBECONFIG_PROD | base64 -d > $HOME/.kube/config
+    - kubectl config use-context $KUBERNETES_CONTEXT_PROD
+    - kubectl set image deployment/bank-back -n $KUBERNETES_NAMESPACE_PROD bank-back=$DOCKER_IMAGE_BACK:$TAG --record
+    - kubectl set image deployment/bank-front -n $KUBERNETES_NAMESPACE_PROD bank-front=$DOCKER_IMAGE_FRONT:$TAG --record
+    - kubectl rollout status deployment/bank-back -n $KUBERNETES_NAMESPACE_PROD
+    - kubectl rollout status deployment/bank-front -n $KUBERNETES_NAMESPACE_PROD
+  only:
+    - main
+  when: manual
+  allow_failure: false
+  on_failure:
+    script:
+      - echo "Production deployment failed!"
