@@ -3,9 +3,9 @@ package com.bankaccount.back_bankaccount.integration;
 import com.bankaccount.back_bankaccount.dto.DepositRequestDto;
 import com.bankaccount.back_bankaccount.dto.WithdrawRequestDto;
 import com.bankaccount.back_bankaccount.dto.OverdraftRequestDto;
-import com.bankaccount.back_bankaccount.model.BankAccountEntity;
-import com.bankaccount.back_bankaccount.repository.IBankAcountRepository;
-import com.bankaccount.back_bankaccount.repository.ITransactionRepository;
+import com.bankaccount.back_bankaccount.adapters.out.persistence.entity.BankAccountJpaEntity;
+import com.bankaccount.back_bankaccount.adapters.out.persistence.repository.BankAccountJpaRepository;
+import com.bankaccount.back_bankaccount.adapters.out.persistence.repository.TransactionJpaRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,10 +34,10 @@ class BankAccountIntegrationTest {
   private WebApplicationContext webApplicationContext;
 
   @Autowired
-  private IBankAcountRepository bankAccountRepository;
+  private BankAccountJpaRepository bankAccountRepository;
 
   @Autowired
-  private ITransactionRepository transactionRepository;
+  private TransactionJpaRepository transactionRepository;
 
   private ObjectMapper objectMapper;
 
@@ -466,12 +466,12 @@ class BankAccountIntegrationTest {
   // HELPER METHODS
   // ========================================
 
-  private BankAccountEntity createAccount(String accountNumber, Double balance) {
+  private BankAccountJpaEntity createAccount(String accountNumber, Double balance) {
     return createAccount(accountNumber, balance, 0.0);
   }
 
-  private BankAccountEntity createAccount(String accountNumber, Double balance, Double overdraftLimit) {
-    BankAccountEntity account = new BankAccountEntity();
+  private BankAccountJpaEntity createAccount(String accountNumber, Double balance, Double overdraftLimit) {
+    BankAccountJpaEntity account = new BankAccountJpaEntity();
     account.setAccountNumber(accountNumber);
     account.setBalance(balance);
     account.setOverdraftLimit(overdraftLimit);
@@ -480,9 +480,9 @@ class BankAccountIntegrationTest {
     return bankAccountRepository.save(account);
   }
 
-  private BankAccountEntity createAccountWithSavings(
+  private BankAccountJpaEntity createAccountWithSavings(
       String accountNumber, Double balance, Double savingsBalance) {
-    BankAccountEntity account = new BankAccountEntity();
+    BankAccountJpaEntity account = new BankAccountJpaEntity();
     account.setAccountNumber(accountNumber);
     account.setBalance(balance);
     account.setOverdraftLimit(0.0);
