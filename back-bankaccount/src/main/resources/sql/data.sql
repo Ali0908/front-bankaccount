@@ -2,7 +2,7 @@
 -- This file is automatically executed by Spring Boot on application startup
 
 INSERT INTO bank_account (account_number, balance, overdraft_limit, savings_balance, savings_deposit_limit) 
-VALUES ('ACC001', 2500.50, 300.0, 500.00, 22950.0);
+VALUES ('ACC001-001', 2500.50, 300.0, 500.00, 22950.0);
 
 -- Sample transactions for testing
 INSERT INTO transaction (account_number, transaction_date, type, amount, balance_after)

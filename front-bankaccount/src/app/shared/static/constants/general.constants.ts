@@ -16,11 +16,17 @@ export const GENERAL_CONSTANTS = {
     CLOSE: 'Fermer',
     SUBMIT: 'Valider',
   },
+  LABELS: {
+    ACCOUNT_NUMBER: 'Numéro de compte',
+    ACCOUNT_BALANCE: 'Compte Courant',
+  },
   MESSAGES: {
     SUCCESS: 'Opération réussie',
     ERROR: 'Une erreur est survenue',
     LOADING: 'Chargement en cours...',
     LOAD_ACCOUNT_ERROR: 'Erreur lors du chargement du compte',
+    SELECT_ACCOUNT_ERROR: 'Aucun compte sélectionné',
+    LOAD_STATEMENT_ERROR: 'Impossible de charger le relevé de compte',
   },
   SNACKBAR: {
     ACTIONS: {

@@ -10,7 +10,7 @@ export class OverdraftService {
   private readonly apiUrl = environment.apiUrl + Paths.PATH_BANK_ACCOUNT;
 
   setOverdraftLimit(accountNumber: string, overdraftLimit: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/overdraft`, {
+    return this.http.post(`${this.apiUrl}${Paths.PATH_OVERDRAFT}`, {
       accountNumber,
       overdraftLimit,
     });

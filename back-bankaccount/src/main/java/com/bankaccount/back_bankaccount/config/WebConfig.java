@@ -26,9 +26,9 @@ public class WebConfig implements WebMvcConfigurer {
         String allowedOrigins = corsProperties.getAllowedOrigins();
         String allowedMethods = corsProperties.getAllowedMethods();
         
-        // Use default values if properties are not set
-        if (allowedOrigins == null || allowedOrigins.isEmpty()) {
-            allowedOrigins = "http://localhost:4200,http://localhost:3000";
+        // Require origins to be provided via configuration (application-secret.properties or environment)
+        if (allowedOrigins == null || allowedOrigins.isBlank()) {
+            throw new IllegalStateException("CORS allowed origins not configured");
         }
         if (allowedMethods == null || allowedMethods.isEmpty()) {
             allowedMethods = "GET,POST,PUT,DELETE,OPTIONS";

@@ -4,8 +4,8 @@ import com.bankaccount.back_bankaccount.domain.model.BankAccount;
 import com.bankaccount.back_bankaccount.dto.BankAccountDto;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Mapper between domain BankAccount and REST DTO.
@@ -38,11 +38,11 @@ public class BankAccountDtoMapper {
      */
     public List<BankAccountDto> toDtoList(List<BankAccount> domains) {
         if (domains == null) {
-            return null;
+            return Collections.emptyList();
         }
         
         return domains.stream()
                 .map(this::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

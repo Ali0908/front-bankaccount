@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.bankaccount.back_bankaccount.constants.BankAccountConstants;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -17,7 +18,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleInsufficientBalanceException(InsufficientBalanceException ex) {
         log.warn("Insufficient balance error: {}", ex.getMessage());
         ErrorResponse errorResponse = new ErrorResponse(
-            "INSUFFICIENT_BALANCE",
+            BankAccountConstants.ERROR_CODE_INSUFFICIENT_BALANCE,
             ex.getMessage()
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
@@ -28,7 +29,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAccountNotFoundException(AccountNotFoundException ex) {
         log.warn("Account not found error: {}", ex.getMessage());
         ErrorResponse errorResponse = new ErrorResponse(
-            "ACCOUNT_NOT_FOUND",
+            BankAccountConstants.ERROR_CODE_ACCOUNT_NOT_FOUND,
             ex.getMessage()
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
@@ -39,8 +40,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
         log.error("Unexpected error: {}", ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse(
-            "INTERNAL_ERROR",
-            "Une erreur inattendue s'est produite"
+            BankAccountConstants.ERROR_CODE_INTERNAL_ERROR,
+            BankAccountConstants.UNEXPECTED_ERROR_MESSAGE
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }

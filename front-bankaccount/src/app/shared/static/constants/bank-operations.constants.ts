@@ -24,6 +24,12 @@ export const BANK_OPERATIONS_CONSTANTS = {
   OVERDRAFT: {
     LABEL: 'Découvert autorisé',
     MAX_LIMIT: 'Max: 300€',
+    MESSAGES: {
+      ACCOUNT_NUMBER_NOT_FOUND: 'Account number not found',
+      ENABLED: 'Découvert activé (max 300€)',
+      DISABLED: 'Découvert désactivé',
+      UPDATE_ERROR: 'Erreur lors de la modification du découvert',
+    },
   },
   SAVINGS_ACCOUNT: {
     LABEL: "Livret d'épargne",

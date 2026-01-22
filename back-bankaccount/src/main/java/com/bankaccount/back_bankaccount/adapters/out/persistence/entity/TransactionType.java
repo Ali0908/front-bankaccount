@@ -1,5 +1,6 @@
 package com.bankaccount.back_bankaccount.adapters.out.persistence.entity;
 
+import com.bankaccount.back_bankaccount.constants.BankAccountConstants;
 import lombok.Getter;
 
 /**
@@ -8,9 +9,9 @@ import lombok.Getter;
  */
 @Getter
 public enum TransactionType {
-    DEPOSIT_CURRENT("Dépôt compte courant"),
+    DEPOSIT_CURRENT(BankAccountConstants.DEPOSIT_CURRENT_LABEL),
     WITHDRAWAL("Retrait"),
-    DEPOSIT_SAVINGS("Dépôt livret d'épargne");
+    DEPOSIT_SAVINGS(BankAccountConstants.DEPOSIT_SAVINGS_LABEL);
 
     private final String label;
 

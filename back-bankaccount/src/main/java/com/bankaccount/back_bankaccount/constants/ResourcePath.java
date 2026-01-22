@@ -14,4 +14,5 @@ public class ResourcePath {
     public static final String PATH_OVERDRAFT = BankAccountConstants.SLASH + "overdraft";
     public static final String PATH_SAVINGS_DEPOSIT = BankAccountConstants.SLASH + "savings-deposit";
     public static final String PATH_STATEMENT = BankAccountConstants.SLASH + "statement";
+    public static final String PATH_STATEMENT_BY_ACCOUNT = PATH_STATEMENT + BankAccountConstants.SLASH + "{accountNumber}";
 }

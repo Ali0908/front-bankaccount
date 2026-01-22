@@ -1,11 +1,11 @@
 package com.bankaccount.back_bankaccount.exception;
 
+import com.bankaccount.back_bankaccount.constants.BankAccountConstants;
+
 public class SavingsAccountOverdraftException extends RuntimeException {
     
-    private static final String DEFAULT_MESSAGE = "Savings accounts cannot have overdraft";
-    
     public SavingsAccountOverdraftException() {
-        super(DEFAULT_MESSAGE);
+        super(BankAccountConstants.SAVINGS_OVERDRAFT_ERROR);
     }
     
     public SavingsAccountOverdraftException(String message) {

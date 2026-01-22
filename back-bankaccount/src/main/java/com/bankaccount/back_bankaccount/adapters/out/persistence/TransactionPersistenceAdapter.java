@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Adapter implementing the TransactionRepositoryPort.
@@ -36,6 +35,6 @@ public class TransactionPersistenceAdapter implements TransactionRepositoryPort 
         return jpaRepository.findByAccountNumberAndTransactionDateAfterOrderByTransactionDateDesc(accountNumber, date)
                 .stream()
                 .map(mapper::toDomain)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

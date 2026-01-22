@@ -45,9 +45,9 @@
         >
         </mat-slide-toggle>
         <span class="overdraft-label">{{ BANK_OPERATIONS_CONSTANTS.OVERDRAFT.LABEL }}</span>
-        <span class="overdraft-info" *ngIf="isOverdraftEnabled()">{{
-          BANK_OPERATIONS_CONSTANTS.OVERDRAFT.MAX_LIMIT
-        }}</span>
+        @if (isOverdraftEnabled()) {
+          <span class="overdraft-info">{{ BANK_OPERATIONS_CONSTANTS.OVERDRAFT.MAX_LIMIT }}</span>
+        }
       </div>
     </div>
 
@@ -60,13 +60,13 @@
       <div class="info-boxes-container">
         <!-- Account Number Box -->
         <div class="info-box account-box">
-          <span class="info-label">Numéro de compte</span>
+          <span class="info-label">{{ GENERAL_CONSTANTS.LABELS.ACCOUNT_NUMBER }}</span>
           <span class="info-value">{{ account?.number || '—' }}</span>
         </div>
 
         <!-- Balance Box -->
         <div class="info-box balance-box">
-          <span class="info-label">Compte Courant</span>
+          <span class="info-label">{{ GENERAL_CONSTANTS.LABELS.ACCOUNT_BALANCE }}</span>
           <span
             class="info-value"
             [ngClass]="{ 'balance-negative': account && account.balance < 0 }"

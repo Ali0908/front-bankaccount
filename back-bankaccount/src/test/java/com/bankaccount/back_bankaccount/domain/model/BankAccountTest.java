@@ -1,6 +1,5 @@
 package com.bankaccount.back_bankaccount.domain.model;
 
-import com.bankaccount.back_bankaccount.exception.InsufficientBalanceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

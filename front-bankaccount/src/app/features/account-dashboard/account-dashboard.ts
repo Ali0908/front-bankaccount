@@ -183,7 +183,7 @@ export class AccountDashboard implements OnInit {
   }
   viewStatement(): void {
     if (!this.account?.number) {
-      this.messageService.showError('Aucun compte sélectionné');
+      this.messageService.showError(this.GENERAL_CONSTANTS.MESSAGES.SELECT_ACCOUNT_ERROR);
       return;
     }
 
@@ -200,7 +200,7 @@ export class AccountDashboard implements OnInit {
           this.loadingStatement.set(false);
         },
         error: (err) => {
-          this.messageService.showError('Impossible de charger le relevé de compte');
+          this.messageService.showError(this.GENERAL_CONSTANTS.MESSAGES.LOAD_STATEMENT_ERROR);
           this.loadingStatement.set(false);
           console.error('Error loading statement:', err);
         },
@@ -224,7 +224,9 @@ export class AccountDashboard implements OnInit {
   onOverdraftToggleChange(isEnabled: boolean): void {
     const accountNumber = this.account?.number;
     if (!accountNumber) {
-      this.messageService.showError('Account number not found');
+      this.messageService.showError(
+        this.BANK_OPERATIONS_CONSTANTS.OVERDRAFT.MESSAGES.ACCOUNT_NUMBER_NOT_FOUND
+      );
       this.isOverdraftEnabled.set(false);
       return;
     }
@@ -232,7 +234,9 @@ export class AccountDashboard implements OnInit {
     const overdraftLimit = isEnabled ? 300 : 0;
     this.overdraftService.setOverdraftLimit(accountNumber, overdraftLimit).subscribe({
       next: () => {
-        const message = isEnabled ? 'Découvert activé (max 300€)' : 'Découvert désactivé';
+        const message = isEnabled
+          ? this.BANK_OPERATIONS_CONSTANTS.OVERDRAFT.MESSAGES.ENABLED
+          : this.BANK_OPERATIONS_CONSTANTS.OVERDRAFT.MESSAGES.DISABLED;
         const actionIcon = isEnabled
           ? this.TRANSACTION_MODAL_CONSTANTS.FEEDBACK.ACTIONS.SUCCESS_ICON
           : this.TRANSACTION_MODAL_CONSTANTS.FEEDBACK.ACTIONS.ERROR_ICON;
@@ -244,10 +248,13 @@ export class AccountDashboard implements OnInit {
       },
       error: (error) => {
         console.error('❌ Erreur lors de la modification du découvert:', error);
-        this.messageService.showError('Erreur lors de la modification du découvert', {
-          action: 'close',
-          duration: 5000,
-        });
+        this.messageService.showError(
+          this.BANK_OPERATIONS_CONSTANTS.OVERDRAFT.MESSAGES.UPDATE_ERROR,
+          {
+            action: 'close',
+            duration: 5000,
+          }
+        );
         this.isOverdraftEnabled.set(!isEnabled);
       },
     });

@@ -7,7 +7,6 @@ import com.bankaccount.back_bankaccount.dto.TransactionDto;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Mapper between domain Statement and REST DTO.
@@ -25,8 +24,8 @@ public class StatementDtoMapper {
         }
         
         List<TransactionDto> transactionDtos = domain.getTransactions().stream()
-                .map(this::toTransactionDto)
-                .collect(Collectors.toList());
+            .map(this::toTransactionDto)
+            .toList();
         
         return StatementDto.builder()
                 .accountNumber(domain.getAccountNumber())

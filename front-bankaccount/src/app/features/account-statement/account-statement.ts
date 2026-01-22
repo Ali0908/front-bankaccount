@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { AccountStatementService } from './../../shared/services/account-statement/account-statement.service';
 import { AccountStatement } from './../../shared/static/models/account-statement';
+import { GENERAL_CONSTANTS } from '../../shared/static/constants/general.constants';
 
 @Component({
   selector: 'app-account-statement',
@@ -27,16 +28,12 @@ export class AccountStatementComponent implements OnInit {
   displayedColumns: string[] = ['date', 'type', 'amount', 'balanceAfter'];
 
   ngOnInit() {
-    console.log('AccountStatementComponent initialized');
-    console.log('History state:', history.state);
-
     const accountNumber = this.getAccountNumberFromRoute();
-    console.log('Account number:', accountNumber);
 
     if (accountNumber) {
       this.loadStatement(accountNumber);
     } else {
-      this.error.set('Numéro de compte manquant');
+      this.error.set(GENERAL_CONSTANTS.MESSAGES.SELECT_ACCOUNT_ERROR);
       console.error('No account number found in navigation state');
     }
   }
@@ -47,13 +44,11 @@ export class AccountStatementComponent implements OnInit {
   }
 
   private loadStatement(accountNumber: string) {
-    console.log('Loading statement for account:', accountNumber);
     this.loading.set(true);
     this.error.set(null);
 
     this.statementService.getStatement(accountNumber).subscribe({
       next: (statement) => {
-        console.log('Statement loaded:', statement);
         this.statement.set(statement);
         // Trier les transactions en antéchronologique
         const sortedTransactions = [...statement.transactions].sort(
@@ -63,7 +58,7 @@ export class AccountStatementComponent implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        this.error.set('Impossible de charger le relevé de compte');
+        this.error.set(GENERAL_CONSTANTS.MESSAGES.LOAD_STATEMENT_ERROR);
         this.loading.set(false);
         console.error('Error loading statement:', err);
       },

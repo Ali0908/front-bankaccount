@@ -1,5 +1,6 @@
 package com.bankaccount.back_bankaccount.domain.model;
 
+import com.bankaccount.back_bankaccount.constants.BankAccountConstants;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -36,7 +37,7 @@ public class BankAccount {
      */
     public void withdraw(Double amount) {
         if (!canWithdraw(amount)) {
-            throw new IllegalStateException("Insufficient balance for withdrawal");
+            throw new IllegalStateException(BankAccountConstants.INSUFFICIENT_BALANCE_ERROR);
         }
         this.balance -= amount;
     }
@@ -61,10 +62,10 @@ public class BankAccount {
      */
     public void setOverdraft(Double limit) {
         if (limit < 0 || limit > 300) {
-            throw new IllegalArgumentException("Overdraft limit must be between 0 and 300");
+            throw new IllegalArgumentException(BankAccountConstants.OVERDRAFT_LIMIT_INVALID_ERROR);
         }
         if (isSavingsAccount()) {
-            throw new IllegalStateException("Savings accounts cannot have overdraft");
+            throw new IllegalStateException(BankAccountConstants.SAVINGS_OVERDRAFT_ERROR);
         }
         this.overdraftLimit = limit;
     }
@@ -84,7 +85,7 @@ public class BankAccount {
         Double availableSpace = getSavingsAvailableSpace();
         
         if (availableSpace <= 0) {
-            throw new IllegalStateException("Savings account is at maximum capacity");
+            throw new IllegalStateException(BankAccountConstants.SAVINGS_AT_CAPACITY_ERROR);
         }
         
         Double depositAmount = Math.min(amount, availableSpace);
@@ -102,11 +103,11 @@ public class BankAccount {
         boolean hasCurrentBalance = this.balance != null && this.balance != 0;
         
         if (hasSavings && hasCurrentBalance) {
-            return "Compte Courant + Livret d'épargne";
+            return BankAccountConstants.ACCOUNT_TYPE_SAVINGS_AND_CURRENT;
         } else if (hasSavings) {
-            return "Livret d'épargne";
+            return BankAccountConstants.ACCOUNT_TYPE_SAVINGS;
         } else {
-            return "Compte Courant";
+            return BankAccountConstants.ACCOUNT_TYPE_CURRENT;
         }
     }
 }

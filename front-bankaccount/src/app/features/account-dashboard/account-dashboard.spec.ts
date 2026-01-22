@@ -11,6 +11,7 @@ import { MessageService } from '../../shared/services/message/message.service';
 import { AccountContextService } from '../../shared/services/account/account-context.service';
 import { ErrorHandlerService } from '../../shared/services/error-handler/error-handler.service';
 import { OverdraftService } from '../../shared/services/overdraft/overdraft.service';
+import { GENERAL_CONSTANTS } from '../../shared/static/constants/general.constants';
 
 describe('AccountDashboard', () => {
   let component: AccountDashboard;
@@ -215,8 +216,8 @@ describe('AccountDashboard', () => {
       const accountLabel = compiled.querySelector('.account-box .info-label');
       const balanceLabel = compiled.querySelector('.balance-box .info-label');
 
-      expect(accountLabel?.textContent?.trim()).toBe('Numéro de compte');
-      expect(balanceLabel?.textContent?.trim()).toBe('Solde');
+      expect(accountLabel?.textContent?.trim()).toBe(GENERAL_CONSTANTS.LABELS.ACCOUNT_NUMBER);
+      expect(balanceLabel?.textContent?.trim()).toBe(GENERAL_CONSTANTS.LABELS.ACCOUNT_BALANCE);
     });
 
     it('should have vertical divider between sidebar and content', () => {

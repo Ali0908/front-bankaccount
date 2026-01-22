@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Adapter implementing the BankAccountRepositoryPort.
@@ -28,7 +27,7 @@ public class BankAccountPersistenceAdapter implements BankAccountRepositoryPort 
     public List<BankAccount> findAll() {
         return jpaRepository.findAll().stream()
                 .map(mapper::toDomain)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

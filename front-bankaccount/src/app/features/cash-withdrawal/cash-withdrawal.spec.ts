@@ -7,6 +7,7 @@ import { CashWithdrawal } from './cash-withdrawal';
 import { BankAccountService } from '../../shared/services/bank-account/bank-account.service';
 import { MessageService } from '../../shared/services/message/message.service';
 import { ErrorHandlerService } from '../../shared/services/error-handler/error-handler.service';
+import { AccountContextService } from '../../shared/services/account/account-context.service';
 
 describe('CashWithdrawal', () => {
   let component: CashWithdrawal;
@@ -16,6 +17,7 @@ describe('CashWithdrawal', () => {
   let mockMessageService: jasmine.SpyObj<MessageService>;
   let mockErrorHandler: jasmine.SpyObj<ErrorHandlerService>;
   let mockRouter: { navigate: jasmine.Spy };
+  let mockAccountContextService: jasmine.SpyObj<AccountContextService>;
 
   beforeEach(async () => {
     mockDialog = jasmine.createSpyObj('MatDialog', ['open']);
@@ -38,6 +40,10 @@ describe('CashWithdrawal', () => {
     mockErrorHandler.getWithdrawalErrorMessage.and.returnValue('Erreur de retrait');
 
     mockRouter = { navigate: jasmine.createSpy('navigate') };
+    mockAccountContextService = jasmine.createSpyObj('AccountContextService', [
+      'getCurrentAccount',
+    ]);
+    mockAccountContextService.getCurrentAccount.and.returnValue({ number: 'ACC001' } as any);
 
     await TestBed.configureTestingModule({
       imports: [CashWithdrawal],
@@ -47,6 +53,7 @@ describe('CashWithdrawal', () => {
         { provide: MessageService, useValue: mockMessageService },
         { provide: ErrorHandlerService, useValue: mockErrorHandler },
         { provide: Router, useValue: mockRouter },
+        { provide: AccountContextService, useValue: mockAccountContextService },
       ],
     }).compileComponents();
 
@@ -59,15 +66,11 @@ describe('CashWithdrawal', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should navigate to dashboard when modal is cancelled', () => {
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard']);
-  });
-
   it('should call withdraw when modal returns data', () => {
     mockDialog.open.and.returnValue({
       afterClosed: () => of({ accountNumber: 'ACC001', amount: 100 }),
     } as any);
-    component.openWithdrawalModal('ACC001');
+    component.openWithdrawalModal();
     expect(mockBankAccountService.withdraw).toHaveBeenCalledWith('ACC001', 100);
   });
 
@@ -76,7 +79,7 @@ describe('CashWithdrawal', () => {
       afterClosed: () => of({ accountNumber: 'ACC001', amount: 100 }),
     } as any);
     mockBankAccountService.withdraw.and.returnValue(throwError(() => ({ status: 400 })));
-    component.openWithdrawalModal('ACC001');
+    component.openWithdrawalModal();
     expect(mockErrorHandler.getWithdrawalErrorMessage).toHaveBeenCalled();
     expect(mockMessageService.showError).toHaveBeenCalled();
   });

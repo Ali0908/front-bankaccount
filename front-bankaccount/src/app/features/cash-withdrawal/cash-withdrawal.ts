@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,6 +12,7 @@ import { BANK_OPERATIONS_CONSTANTS } from '../../shared/static/constants/bank-op
 import { BankAccountService } from '../../shared/services/bank-account/bank-account.service';
 import { MessageService } from '../../shared/services/message/message.service';
 import { ErrorHandlerService } from '../../shared/services/error-handler/error-handler.service';
+import { AccountContextService } from '../../shared/services/account/account-context.service';
 
 @Component({
   selector: 'app-cash-withdrawal',
@@ -22,10 +23,10 @@ import { ErrorHandlerService } from '../../shared/services/error-handler/error-h
       mat-raised-button
       color="warn"
       class="withdrawal-button"
-      (click)="openWithdrawalModal(accountNumber)"
+      (click)="openWithdrawalModal()"
     >
       <mat-icon>arrow_upward</mat-icon>
-      Retrait d'argent
+      {{ WITHDRAWAL_TITLE }}
     </button>
   `,
   styles: [
@@ -38,23 +39,21 @@ import { ErrorHandlerService } from '../../shared/services/error-handler/error-h
     `,
   ],
 })
-export class CashWithdrawal implements OnInit {
+export class CashWithdrawal {
   private readonly dialog = inject(MatDialog);
   private readonly bankAccountService = inject(BankAccountService);
   private readonly messageService = inject(MessageService);
   private readonly errorHandler = inject(ErrorHandlerService);
   private readonly router = inject(Router);
+  private readonly accountContextService = inject(AccountContextService);
   private readonly WITHDRAWAL_SUCCESS = BANK_OPERATIONS_CONSTANTS.WITHDRAWAL.SUCCESS_MESSAGE;
+  protected readonly WITHDRAWAL_TITLE = BANK_OPERATIONS_CONSTANTS.WITHDRAWAL.TITLE;
 
-  accountNumber: string = 'ACC001'; // À remplacer par une entrée @Input
-
-  ngOnInit(): void {
-    this.openWithdrawalModal(this.accountNumber);
-  }
-
-  openWithdrawalModal(accountNumber: string): void {
+  openWithdrawalModal(): void {
+    const currentAccount = this.accountContextService.getCurrentAccount();
+    const targetAccountNumber = currentAccount?.number || 'ACC001';
     const dialogRef = this.dialog.open(TransactionModal, {
-      data: { type: TRANSACTION_TYPES.WITHDRAWAL, accountNumber: accountNumber },
+      data: { type: TRANSACTION_TYPES.WITHDRAWAL, accountNumber: targetAccountNumber },
     });
 
     dialogRef.afterClosed().subscribe((result: TransactionResult | undefined) => {
@@ -69,7 +68,6 @@ export class CashWithdrawal implements OnInit {
           },
         });
       } else {
-        // Retour au dashboard si l'utilisateur annule
         this.router.navigate(['/dashboard']);
       }
     });

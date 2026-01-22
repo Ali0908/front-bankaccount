@@ -2,6 +2,7 @@ package com.bankaccount.back_bankaccount.dto;
 
 import java.io.Serializable;
 
+import com.bankaccount.back_bankaccount.constants.BankAccountConstants;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -19,10 +20,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DepositRequestDto implements Serializable {
 
-    @NotBlank(message = "Account number is required")
+    @NotBlank(message = BankAccountConstants.ACCOUNT_NUMBER_REQUIRED_MESSAGE)
     private String accountNumber;
     
-    @NotNull(message = "Amount is required")
-    @Positive(message = "Amount must be positive")
+    @NotNull(message = BankAccountConstants.AMOUNT_REQUIRED_MESSAGE)
+    @Positive(message = BankAccountConstants.AMOUNT_POSITIVE_MESSAGE)
     private Double amount;
 }

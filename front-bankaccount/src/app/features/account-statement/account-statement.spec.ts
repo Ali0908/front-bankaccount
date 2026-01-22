@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter, Router } from '@angular/router';
@@ -90,18 +90,21 @@ describe('AccountStatementComponent', () => {
     expect(firstDate.getTime()).toBeGreaterThan(secondDate.getTime());
   });
 
-  it('should handle error when loading statement', () => {
+  it('should handle error when loading statement', fakeAsync(() => {
     // Simulate navigation state with unknown account
     history.pushState({ accountNumber: 'UNKNOWN' }, '', '/');
 
     service.getStatement.and.returnValue(throwError(() => new Error('Account not found')));
 
+    spyOn(console, 'error'); // Suppress error logging
+
     fixture.detectChanges();
+    tick();
 
     expect(component.error()).toBe('Impossible de charger le relevé de compte');
     expect(component.loading()).toBe(false);
     expect(component.statement()).toBeNull();
-  });
+  }));
 
   it('should navigate back when goBack is called', () => {
     component.goBack();

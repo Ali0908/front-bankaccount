@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bankaccount.back_bankaccount.adapters.in.rest.mapper.BankAccountDtoMapper;
 import com.bankaccount.back_bankaccount.adapters.in.rest.mapper.StatementDtoMapper;
+import com.bankaccount.back_bankaccount.constants.BankAccountConstants;
 import com.bankaccount.back_bankaccount.constants.ResourcePath;
 import com.bankaccount.back_bankaccount.domain.model.BankAccount;
 import com.bankaccount.back_bankaccount.domain.model.Statement;
@@ -106,8 +107,8 @@ public class BankAccountRestController {
         return ResponseEntity.ok(accountMapper.toDto(account));
     }
 
-    @GetMapping(value = ResourcePath.PATH_STATEMENT, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<StatementDto> getStatement(@PathVariable String accountNumber) {
+    @GetMapping(value = ResourcePath.PATH_STATEMENT_BY_ACCOUNT, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<StatementDto> getStatement(@PathVariable(BankAccountConstants.ACCOUNT_NUMBER) String accountNumber) {
         log.info("Get statement request for account {}", accountNumber);
         
         Statement statement = getStatementUseCase.getStatement(accountNumber);
